@@ -285,4 +285,9 @@ interface IMevCommitAVS {
 
     /// @dev Returns the address of AVS directory.
     function avsDirectory() external view returns (address);
+
+    /// @notice Mapping of validator pubkeys to their registration info
+    function validatorRegistrations(
+        bytes memory pubkey
+    ) external view returns (ValidatorRegistrationInfo memory);
 }

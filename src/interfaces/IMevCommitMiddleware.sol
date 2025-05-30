@@ -361,4 +361,9 @@ interface IMevCommitMiddleware {
 
     /// @return Length of the valset for a given vault and operator.
     function valsetLength(address vault, address operator) external view returns (uint256);
+
+    /// @notice Mapping of a validator's BLS public key to its validator record.
+    function validatorRecords(
+        bytes memory blsPubkey
+    ) external view returns (ValidatorRecord memory);
 }

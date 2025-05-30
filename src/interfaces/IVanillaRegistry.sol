@@ -190,4 +190,9 @@ interface IVanillaRegistry {
     function getBlocksTillWithdrawAllowed(
         bytes calldata valBLSPubKey
     ) external view returns (uint256);
+
+    /// @dev Mapping of BLS pubkeys to stored staked validator structs.
+    function stakedValidators(
+        bytes memory pubkey
+    ) external view returns (StakedValidator memory);
 }
