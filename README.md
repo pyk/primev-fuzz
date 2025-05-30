@@ -10,10 +10,11 @@ Mev-commit is a peer-to-peer networking platform designed to facilitate real-tim
 - End Date: June 3, 2025
 - Total Prize Pool: $12,000
 - Mandatory POC
+- Commmit: [`c902f8cc9101c2d84d123a0422044026fd91209a`](https://github.com/primev/mev-commit/tree/c902f8cc9101c2d84d123a0422044026fd91209a/contracts/contracts/validator-registry/rewards)
 
 ## Scope
 
 ```
-src/RewardManager.sol
-src/RewardManagerStorage.sol
+src/validator-registry/rewards/RewardManager.sol
+src/validator-registry/rewards/RewardManagerStorage.sol
 ```
