@@ -13,3 +13,6 @@ out/
 # Medusa
 crytic-export
 corpus
+
+# Repomix
+repomix.xml
