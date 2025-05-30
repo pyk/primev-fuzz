@@ -11,6 +11,8 @@ import { MevCommitMiddlewareMock } from "./mocks/MevCommitMiddlewareMock.sol";
 import { VanillaRegistryMock } from "./mocks/VanillaRegistryMock.sol";
 
 contract Setup is Test {
+    uint256 maxValidators = 5;
+
     struct Deployment {
         address owner;
         VanillaRegistryMock vanillaRegistry;
@@ -20,15 +22,15 @@ contract Setup is Test {
     }
 
     function deployVanillaRegistryMock() internal returns (VanillaRegistryMock deployment) {
-        deployment = new VanillaRegistryMock();
+        deployment = new VanillaRegistryMock(maxValidators);
     }
 
     function deployMevCommitAVSMock() internal returns (MevCommitAVSMock deployment) {
-        deployment = new MevCommitAVSMock();
+        deployment = new MevCommitAVSMock(maxValidators);
     }
 
     function deployMevCommitMiddlewareMock() internal returns (MevCommitMiddlewareMock deployment) {
-        deployment = new MevCommitMiddlewareMock();
+        deployment = new MevCommitMiddlewareMock(maxValidators);
     }
 
     function deployRewardManager(
