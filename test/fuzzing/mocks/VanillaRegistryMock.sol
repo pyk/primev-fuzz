@@ -8,13 +8,11 @@ contract VanillaRegistryMock {
     uint256 public maxValidators;
     uint256 public validatorCount;
     mapping(bytes pubkey => IVanillaRegistry.StakedValidator) validators;
-    bytes[] pubkeys;
 
     constructor(
         uint256 maxValidators_
     ) {
         maxValidators = maxValidators_;
-        pubkeys = new bytes[](maxValidators);
     }
 
     function register(bytes memory pubkey, address withdrawalAddress, uint256 balance, uint256 blockHeight) external {
@@ -23,7 +21,6 @@ contract VanillaRegistryMock {
         require(!validators[pubkey].exists, "pubkey exists");
 
         // Add record
-        pubkeys.push(pubkey);
         validators[pubkey] = IVanillaRegistry.StakedValidator({
             exists: true,
             withdrawalAddress: withdrawalAddress,
@@ -31,6 +28,16 @@ contract VanillaRegistryMock {
             unstakeOccurrence: BlockHeightOccurrence.Occurrence({ exists: true, blockHeight: blockHeight })
         });
         validatorCount += 1;
+    }
+
+    function unregister(
+        bytes memory pubkey
+    ) external {
+        require(pubkey.length == 48, "invalid pubkey");
+        require(validators[pubkey].exists, "pubkey not exists");
+        validatorCount -= 1;
+        validators[pubkey].exists = false;
+        validators[pubkey].withdrawalAddress = address(0);
     }
 
     function stakedValidators(

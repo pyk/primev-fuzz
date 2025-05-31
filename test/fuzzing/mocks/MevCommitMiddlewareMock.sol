@@ -8,13 +8,11 @@ contract MevCommitMiddlewareMock {
     uint256 public maxValidators;
     uint256 public validatorCount;
     mapping(bytes pubkey => IMevCommitMiddleware.ValidatorRecord) records;
-    bytes[] pubkeys;
 
     constructor(
         uint256 maxValidators_
     ) {
         maxValidators = maxValidators_;
-        pubkeys = new bytes[](maxValidators);
     }
 
     function register(bytes memory pubkey, address vault, address operator, uint256 timestamp) external {
@@ -23,7 +21,6 @@ contract MevCommitMiddlewareMock {
         require(!records[pubkey].exists, "pubkey exists");
 
         // Add record
-        pubkeys.push(pubkey);
         records[pubkey] = IMevCommitMiddleware.ValidatorRecord({
             exists: true,
             vault: vault,
@@ -31,6 +28,16 @@ contract MevCommitMiddlewareMock {
             deregRequestOccurrence: TimestampOccurrence.Occurrence({ exists: true, timestamp: timestamp })
         });
         validatorCount += 1;
+    }
+
+    function unregister(
+        bytes memory pubkey
+    ) external {
+        require(pubkey.length == 48, "invalid pubkey");
+        require(records[pubkey].exists, "pubkey not exists");
+        validatorCount -= 1;
+        records[pubkey].exists = false;
+        records[pubkey].operator = address(0);
     }
 
     function validatorRecords(

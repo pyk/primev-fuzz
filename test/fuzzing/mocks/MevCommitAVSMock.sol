@@ -8,13 +8,11 @@ contract MevCommitAVSMock {
     uint256 public maxValidators;
     uint256 public validatorCount;
     mapping(bytes pubkey => IMevCommitAVS.ValidatorRegistrationInfo) infos;
-    bytes[] pubkeys;
 
     constructor(
         uint256 maxValidators_
     ) {
         maxValidators = maxValidators_;
-        pubkeys = new bytes[](maxValidators);
     }
 
     function register(
@@ -27,20 +25,7 @@ contract MevCommitAVSMock {
         require(validatorCount <= maxValidators, "max validators reached");
         require(!infos[pubkey].exists, "pubkey exists");
 
-        /// @notice Struct representing MevCommitAVS registration info for a validator
-        // struct ValidatorRegistrationInfo {
-        //     /// @notice Whether the validator is registered with MevCommitAVS
-        //     bool exists;
-        //     /// @notice Address of the pod owner for the validator
-        //     address podOwner;
-        //     /// @notice Block height at which the validator was possibly frozen
-        //     BlockHeightOccurrence.Occurrence freezeOccurrence;
-        //     /// @notice Block height at which the validator possibly requested deregistration
-        //     BlockHeightOccurrence.Occurrence deregRequestOccurrence;
-        // }
-
         // Add record
-        pubkeys.push(pubkey);
         infos[pubkey] = IMevCommitAVS.ValidatorRegistrationInfo({
             exists: true,
             podOwner: podOwner,
@@ -51,6 +36,16 @@ contract MevCommitAVSMock {
             })
         });
         validatorCount += 1;
+    }
+
+    function unregister(
+        bytes memory pubkey
+    ) external {
+        require(pubkey.length == 48, "invalid pubkey");
+        require(infos[pubkey].exists, "pubkey is not exists");
+        infos[pubkey].exists = false;
+        infos[pubkey].podOwner = address(0);
+        validatorCount -= 1;
     }
 
     function validatorRegistrations(

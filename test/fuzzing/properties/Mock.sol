@@ -9,7 +9,7 @@ contract MockProperties is BaseProperties {
         address vault,
         address operator,
         uint256 timestamp
-    ) external payable {
+    ) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached =
@@ -27,12 +27,29 @@ contract MockProperties is BaseProperties {
         }
     }
 
+    function MevCommitMiddlewareMock_unregister(
+        bytes memory pubkey
+    ) external {
+        // Pre-conditions
+        bool isPubkeyInvalid = pubkey.length != 48;
+        bool isValidatorNotExists = !primev.mevCommitMiddleware.validatorRecords(pubkey).exists;
+
+        // Action
+        try primev.mevCommitMiddleware.unregister(pubkey) {
+            // Post-conditions
+            t(!isPubkeyInvalid, "MCMRE01"); // Invalid key should revert
+            t(!isValidatorNotExists, "MCMR02"); // Should revert when validator not exists
+        } catch {
+            assert(isPubkeyInvalid || isValidatorNotExists);
+        }
+    }
+
     function VanillaRegistryMock_register(
         bytes memory pubkey,
         address withdrawalAddress,
         uint256 balance,
         uint256 blockHeight
-    ) external payable {
+    ) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.vanillaRegistry.validatorCount() == primev.vanillaRegistry.maxValidators();
@@ -49,12 +66,29 @@ contract MockProperties is BaseProperties {
         }
     }
 
+    function VanillaRegistryMock_unregister(
+        bytes memory pubkey
+    ) external {
+        // Pre-conditions
+        bool isPubkeyInvalid = pubkey.length != 48;
+        bool isValidatorNotExists = !primev.vanillaRegistry.stakedValidators(pubkey).exists;
+
+        // Action
+        try primev.vanillaRegistry.unregister(pubkey) {
+            // Post-conditions
+            t(!isPubkeyInvalid, "VRMRE01"); // Invalid key should revert
+            t(!isValidatorNotExists, "VRMR02"); // Should revert when validator not exists
+        } catch {
+            assert(isPubkeyInvalid || isValidatorNotExists);
+        }
+    }
+
     function MevCommitAVSMock_register(
         bytes memory pubkey,
         address withdrawalAddress,
         uint256 balance,
         uint256 blockHeight
-    ) external payable {
+    ) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.mevCommitAVS.validatorCount() == primev.mevCommitAVS.maxValidators();
@@ -68,6 +102,23 @@ contract MockProperties is BaseProperties {
             t(!isValidatorExists, "VRMR03"); // Should revert when validator exists
         } catch {
             assert(isPubkeyInvalid || isMaxValidatorsReached || isValidatorExists);
+        }
+    }
+
+    function MevCommitAVSMock_unregister(
+        bytes memory pubkey
+    ) external {
+        // Pre-conditions
+        bool isPubkeyInvalid = pubkey.length != 48;
+        bool isValidatorNotExists = !primev.mevCommitAVS.validatorRegistrations(pubkey).exists;
+
+        // Action
+        try primev.mevCommitAVS.unregister(pubkey) {
+            // Post-conditions
+            t(!isPubkeyInvalid, "VRMRE01"); // Invalid key should revert
+            t(!isValidatorNotExists, "VRMR03"); // Should revert when validator not exists
+        } catch {
+            assert(isPubkeyInvalid || isValidatorNotExists);
         }
     }
 }
