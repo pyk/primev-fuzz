@@ -16,6 +16,9 @@ import { ClaimRewardsProperties } from "./properties/ClaimRewards.sol";
 import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
 import { PayProposerProperties } from "./properties/PayProposer.sol";
 
+// Global
+import { GlobalProperties } from "./properties/Global.sol";
+
 contract Fuzz is
     ClaimOrphanedRewardsProperties,
     PauseProperties,
@@ -25,7 +28,8 @@ contract Fuzz is
     AutoClaimProperties,
     ClaimRewardsProperties,
     OverrideReceiverProperties,
-    PayProposerProperties
+    PayProposerProperties,
+    GlobalProperties
 {
     constructor() {
         setupReceivers();
