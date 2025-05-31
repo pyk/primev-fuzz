@@ -45,7 +45,4 @@ contract MevCommitMiddlewareMock {
     ) external view returns (IMevCommitMiddleware.ValidatorRecord memory record) {
         record = records[pubkey];
     }
-
-    /// @dev Allows to receive random eth from fuzzing squence
-    receive() external payable { }
 }

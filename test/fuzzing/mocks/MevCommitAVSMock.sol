@@ -53,7 +53,4 @@ contract MevCommitAVSMock {
     ) external view returns (IMevCommitAVS.ValidatorRegistrationInfo memory info) {
         info = infos[pubkey];
     }
-
-    /// @dev Allows to receive random eth from fuzzing squence
-    receive() external payable { }
 }

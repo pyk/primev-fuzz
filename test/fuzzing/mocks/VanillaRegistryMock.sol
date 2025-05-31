@@ -45,7 +45,4 @@ contract VanillaRegistryMock {
     ) external view returns (IVanillaRegistry.StakedValidator memory validator) {
         validator = validators[pubkey];
     }
-
-    /// @dev Allows to receive random eth from fuzzing squence
-    receive() external payable { }
 }

@@ -6,14 +6,15 @@ import { BaseProperties } from "./Base.sol";
 contract RemoveFromAutoClaimBlacklistProperties is BaseProperties {
     /// @custom:property RABS01 After auto claim blacklist is removed, autoClaimBlacklist[addr] should be false
     function removeFromAutoClaimBlacklist(
-        address addr
+        uint256 receiverId
     ) external {
+        address receiver = getRandomReceiver(receiverId);
         // Action
         vm.prank(primev.owner);
-        try primev.rewardManager.removeFromAutoClaimBlacklist(addr) {
+        try primev.rewardManager.removeFromAutoClaimBlacklist(receiver) {
             // Post-conditions
 
-            t(primev.rewardManager.autoClaimBlacklist(addr) == false, "RABS01");
+            t(primev.rewardManager.autoClaimBlacklist(receiver) == false, "RABS01");
         } catch {
             assert(false);
         }

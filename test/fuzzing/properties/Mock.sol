@@ -4,20 +4,17 @@ pragma solidity 0.8.26;
 import { BaseProperties } from "./Base.sol";
 
 contract MockProperties is BaseProperties {
-    function MevCommitMiddlewareMock_register(
-        bytes memory pubkey,
-        address vault,
-        address operator,
-        uint256 timestamp
-    ) external {
+    function MevCommitMiddlewareMock_register(bytes memory pubkey, uint256 operatorId) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached =
             primev.mevCommitMiddleware.validatorCount() == primev.mevCommitMiddleware.maxValidators();
         bool isValidatorExists = primev.mevCommitMiddleware.validatorRecords(pubkey).exists;
 
+        address operator = getRandomReceiver(operatorId);
+
         // Action
-        try primev.mevCommitMiddleware.register(pubkey, vault, operator, timestamp) {
+        try primev.mevCommitMiddleware.register(pubkey, address(0), operator, 0) {
             // Post-conditions
             t(!isPubkeyInvalid, "MCMRE01"); // Invalid key should revert
             t(!isMaxValidatorsReached, "MCMRE02"); // Should revert when max validators reached
@@ -44,19 +41,15 @@ contract MockProperties is BaseProperties {
         }
     }
 
-    function VanillaRegistryMock_register(
-        bytes memory pubkey,
-        address withdrawalAddress,
-        uint256 balance,
-        uint256 blockHeight
-    ) external {
+    function VanillaRegistryMock_register(bytes memory pubkey, uint256 withdrawalAddressId) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.vanillaRegistry.validatorCount() == primev.vanillaRegistry.maxValidators();
         bool isValidatorExists = primev.vanillaRegistry.stakedValidators(pubkey).exists;
+        address withdrawalAddress = getRandomReceiver(withdrawalAddressId);
 
         // Action
-        try primev.vanillaRegistry.register(pubkey, withdrawalAddress, balance, blockHeight) {
+        try primev.vanillaRegistry.register(pubkey, withdrawalAddress, 0, 0) {
             // Post-conditions
             t(!isPubkeyInvalid, "VRMRE01"); // Invalid key should revert
             t(!isMaxValidatorsReached, "VRMRE02"); // Should revert when max validators reached
@@ -83,19 +76,15 @@ contract MockProperties is BaseProperties {
         }
     }
 
-    function MevCommitAVSMock_register(
-        bytes memory pubkey,
-        address withdrawalAddress,
-        uint256 balance,
-        uint256 blockHeight
-    ) external {
+    function MevCommitAVSMock_register(bytes memory pubkey, uint256 withdrawalAddressId) external {
         // Pre-conditions
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.mevCommitAVS.validatorCount() == primev.mevCommitAVS.maxValidators();
         bool isValidatorExists = primev.mevCommitAVS.validatorRegistrations(pubkey).exists;
+        address withdrawalAddress = getRandomReceiver(withdrawalAddressId);
 
         // Action
-        try primev.mevCommitAVS.register(pubkey, withdrawalAddress, balance, blockHeight) {
+        try primev.mevCommitAVS.register(pubkey, withdrawalAddress, 0, 0) {
             // Post-conditions
             t(!isPubkeyInvalid, "VRMRE01"); // Invalid key should revert
             t(!isMaxValidatorsReached, "VRMRE02"); // Should revert when max validators reached

@@ -26,49 +26,47 @@ contract AutoClaimProperties is BaseProperties {
     /// @custom:property EACS01 If claimExistingRewards=true, the claimer balance will increased by exactly unclaimed rewards and the unclamed rewards of claimer should be zero
     /// @custom:property EACS02 If claimExistingRewards=false, the claimer balance and the unclaimed rewards should not change
     /// @custom:property EACS03 After enableAutoClaim. the autoClaim of claimer should set to true
-    function enableAutoClaim(address claimer, bool claimExistingRewards) external {
+    function enableAutoClaim(uint256 claimerId, bool claimExistingRewards) external {
         // Pre-conditions
         AutoClaimVars memory vars;
-        vars.claimer = claimer;
-
-        bool isPaused = primev.rewardManager.paused();
+        vars.claimer = getRandomReceiver(claimerId);
         AutoClaimSnapshot memory pre = autoClaimSnapshot(vars);
 
-        bool isClaimerRewardManager = claimExistingRewards
-            && (
-                claimer == address(primev.rewardManager)
-                    || claimer == IProxy(address(primev.rewardManager)).implementation()
-            ) && pre.unclaimedRewards > 0;
+        bool isPaused = primev.rewardManager.paused();
+        bool isClaimerCannotReceiverEther = !ethReceivers[vars.claimer];
 
         // Action
-        vm.prank(claimer);
+        vm.prank(vars.claimer);
         try primev.rewardManager.enableAutoClaim(claimExistingRewards) {
             AutoClaimSnapshot memory post = autoClaimSnapshot(vars);
 
             // Post-conditions
             t(!isPaused, "EACE01"); // If contract is paused, it should revert
-            t(!isClaimerRewardManager, "EACE02"); // If contract can't receive ether, it should revert
+            if (claimExistingRewards && pre.unclaimedRewards > 0) {
+                t(!isClaimerCannotReceiverEther, "EACE02"); // If contract can't receive ether, it should revert
+            }
 
             if (claimExistingRewards) {
-                t(post.claimerBalance == pre.claimerBalance + pre.unclaimedRewards, "EACS01");
-                t(post.unclaimedRewards == 0, "EACS01");
+                t(post.claimerBalance == pre.claimerBalance + pre.unclaimedRewards, "EACS01_1");
+                t(post.unclaimedRewards == 0, "EACS01_2");
             } else {
-                t(post.claimerBalance == pre.claimerBalance, "EACS02");
-                t(post.unclaimedRewards == pre.unclaimedRewards, "EACS02");
+                t(post.claimerBalance == pre.claimerBalance, "EACS02_1");
+                t(post.unclaimedRewards == pre.unclaimedRewards, "EACS02_2");
             }
-            t(primev.rewardManager.autoClaim(claimer) == true, "EACS03");
+            t(primev.rewardManager.autoClaim(vars.claimer) == true, "EACS03");
         } catch {
-            assert(isPaused || isClaimerRewardManager);
+            assert(isPaused || isClaimerCannotReceiverEther);
         }
     }
 
     /// @custom:property DACE01 If contract is paused, disable auto claim operation should revert
     /// @custom:property DACS01 After disable auto claim, the claimer auto claim should be disabled
     function disableAutoClaim(
-        address claimer
+        uint256 claimerId
     ) external {
         // Pre-conditions
         bool isPaused = primev.rewardManager.paused();
+        address claimer = getRandomReceiver(claimerId);
 
         // Action
         vm.prank(claimer);

@@ -35,12 +35,6 @@ contract PayProposerProperties is BaseProperties {
         s.overrideBalance = vars.overrideAddress.balance;
     }
 
-    function isFailedSend(
-        address addr
-    ) internal returns (bool) {
-        return addr == address(primev.rewardManager) || addr == IProxy(address(primev.rewardManager)).implementation();
-    }
-
     /// @custom:audit no paused is intentional by the dev
     /// @custom:property PPE01 If pubkey is invalid, it should revert
     /// @custom:property PPE02 If msg.value is zero, it should revert
@@ -79,7 +73,7 @@ contract PayProposerProperties is BaseProperties {
             } else {
                 if (vars.overrideAddress != address(0)) {
                     if (vars.autoClaimEnabled && !vars.autoClaimBlacklist) {
-                        if (isFailedSend(vars.overrideAddress)) {
+                        if (!ethReceivers[vars.overrideAddress]) {
                             t(primev.rewardManager.autoClaim(vars.receiver) == false, "PPS03_1");
                             t(primev.rewardManager.autoClaimBlacklist(vars.receiver) == true, "PPS03_2");
                             t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS03_3");
@@ -99,7 +93,7 @@ contract PayProposerProperties is BaseProperties {
                     }
                 } else {
                     if (vars.autoClaimEnabled && !vars.autoClaimBlacklist) {
-                        if (isFailedSend(vars.overrideAddress)) {
+                        if (!ethReceivers[vars.receiver]) {
                             t(primev.rewardManager.autoClaim(vars.receiver) == false, "PPS03_14");
                             t(primev.rewardManager.autoClaimBlacklist(vars.receiver) == true, "PPS03_15");
                             t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS03_16");
@@ -107,8 +101,8 @@ contract PayProposerProperties is BaseProperties {
                             t(post.overrideBalance == pre.overrideBalance, "PPS03_18");
                         } else {
                             t(post.rewardManagerBalance == pre.rewardManagerBalance, "PPS03_19");
-                            t(post.overrideBalance == pre.overrideBalance + vars.amountIn, "PPS03_20");
-                            t(post.receiverBalance == pre.receiverBalance, "PPS03_21");
+                            t(post.receiverBalance == pre.receiverBalance + vars.amountIn, "PPS03_20");
+                            t(post.overrideBalance == pre.overrideBalance, "PPS03_21");
                             t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "PPS03_22");
                             t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "PPS03_23");
                         }

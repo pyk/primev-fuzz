@@ -28,9 +28,7 @@ contract Fuzz is
     PayProposerProperties
 {
     constructor() {
+        setupReceivers();
         primev = deployContracts();
     }
-
-    /// @dev Allows to receive random eth from fuzzing squence
-    receive() external payable { }
 }

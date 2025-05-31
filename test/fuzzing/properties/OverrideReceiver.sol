@@ -29,8 +29,9 @@ contract OverrideReceiverProperties is BaseProperties {
     /// @custom:property ORS01 If migrateExistingRewards=true, the unclaimed rewards of receiver should be zero and the unclaimed rewards of overrideAddress should be increased exactly by the unclaimed rewards of receiver
     /// @custom:property ORS02 If migrateExistingRewards=false, the unclaimed rewards of receiver and override addres should be the same as before operations
     /// @custom:property ORS03 The overrideAddress of receiver should be updated
-    function overrideReceiver(bytes memory pubkey, address overrideAddress, bool migrateExistingRewards) external {
+    function overrideReceiver(bytes memory pubkey, uint256 overrideAddressId, bool migrateExistingRewards) external {
         // Pre-conditions
+        address overrideAddress = getRandomReceiver(overrideAddressId);
         OverrideReceiverVars memory vars;
         address receiver = primev.rewardManager.findReceiver(pubkey);
         if (receiver == address(0)) return;
