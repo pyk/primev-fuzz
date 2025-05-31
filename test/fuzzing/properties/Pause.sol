@@ -4,6 +4,8 @@ pragma solidity 0.8.26;
 import { BaseProperties } from "./Base.sol";
 
 contract PauseProperties is BaseProperties {
+    /// @custom:property PAE01 If contract is paused, the operation will revert
+    /// @custom:property PAS01 After pause, the contract is paused
     function pause() external payable {
         // Pre-conditions
         bool isEnforcedPause = primev.rewardManager.paused();
@@ -11,13 +13,15 @@ contract PauseProperties is BaseProperties {
         // Action
         vm.prank(primev.owner);
         try primev.rewardManager.pause() {
-            t(!isEnforcedPause, "RMPS-E01"); // If contract is paused, it should revert
-            t(primev.rewardManager.paused(), "RMPS-S01");
+            t(!isEnforcedPause, "PAE01"); // If contract is paused, it should revert
+            t(primev.rewardManager.paused(), "PAS01");
         } catch {
             assert(isEnforcedPause);
         }
     }
 
+    /// @custom:property UPE01 If contact is not paused, the operation will revert
+    /// @custom:property UPS01 After unpause, the contract is not paused
     function unpause() external payable {
         // Pre-conditions
         bool isExpectedPause = primev.rewardManager.paused();
@@ -25,8 +29,8 @@ contract PauseProperties is BaseProperties {
         // Action
         vm.prank(primev.owner);
         try primev.rewardManager.unpause() {
-            t(isExpectedPause, "RMUP-E01"); // If contract is paused, it should revert
-            t(primev.rewardManager.paused() == false, "RMUP-S01");
+            t(isExpectedPause, "UPE01"); // If contract is paused, it should revert
+            t(primev.rewardManager.paused() == false, "UPS01");
         } catch {
             assert(!isExpectedPause);
         }
