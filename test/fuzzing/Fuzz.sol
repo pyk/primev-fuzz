@@ -15,7 +15,6 @@ import { AutoClaimProperties } from "./properties/AutoClaim.sol";
 import { ClaimRewardsProperties } from "./properties/ClaimRewards.sol";
 import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
 import { PayProposerProperties } from "./properties/PayProposer.sol";
-import { RemoveOverrideAddressProperties } from "./properties/RemoveOverrideAddress.sol";
 
 contract Fuzz is
     ClaimOrphanedRewardsProperties,
@@ -26,8 +25,7 @@ contract Fuzz is
     AutoClaimProperties,
     ClaimRewardsProperties,
     OverrideReceiverProperties,
-    PayProposerProperties,
-    RemoveOverrideAddressProperties
+    PayProposerProperties
 {
     constructor() {
         primev = deployContracts();
