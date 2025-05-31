@@ -4,8 +4,9 @@ pragma solidity 0.8.26;
 import { BaseProperties } from "./Base.sol";
 
 contract MockProperties is BaseProperties {
-    function MevCommitMiddlewareMock_register(bytes memory pubkey, uint256 operatorId) external {
+    function MevCommitMiddlewareMock_register(uint256 pubkeyId, uint256 operatorId) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached =
             primev.mevCommitMiddleware.validatorCount() == primev.mevCommitMiddleware.maxValidators();
@@ -25,9 +26,10 @@ contract MockProperties is BaseProperties {
     }
 
     function MevCommitMiddlewareMock_unregister(
-        bytes memory pubkey
+        uint256 pubkeyId
     ) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isValidatorNotExists = !primev.mevCommitMiddleware.validatorRecords(pubkey).exists;
 
@@ -41,8 +43,9 @@ contract MockProperties is BaseProperties {
         }
     }
 
-    function VanillaRegistryMock_register(bytes memory pubkey, uint256 withdrawalAddressId) external {
+    function VanillaRegistryMock_register(uint256 pubkeyId, uint256 withdrawalAddressId) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.vanillaRegistry.validatorCount() == primev.vanillaRegistry.maxValidators();
         bool isValidatorExists = primev.vanillaRegistry.stakedValidators(pubkey).exists;
@@ -60,9 +63,10 @@ contract MockProperties is BaseProperties {
     }
 
     function VanillaRegistryMock_unregister(
-        bytes memory pubkey
+        uint256 pubkeyId
     ) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isValidatorNotExists = !primev.vanillaRegistry.stakedValidators(pubkey).exists;
 
@@ -76,8 +80,9 @@ contract MockProperties is BaseProperties {
         }
     }
 
-    function MevCommitAVSMock_register(bytes memory pubkey, uint256 withdrawalAddressId) external {
+    function MevCommitAVSMock_register(uint256 pubkeyId, uint256 withdrawalAddressId) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isMaxValidatorsReached = primev.mevCommitAVS.validatorCount() == primev.mevCommitAVS.maxValidators();
         bool isValidatorExists = primev.mevCommitAVS.validatorRegistrations(pubkey).exists;
@@ -95,9 +100,10 @@ contract MockProperties is BaseProperties {
     }
 
     function MevCommitAVSMock_unregister(
-        bytes memory pubkey
+        uint256 pubkeyId
     ) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         bool isPubkeyInvalid = pubkey.length != 48;
         bool isValidatorNotExists = !primev.mevCommitAVS.validatorRegistrations(pubkey).exists;
 

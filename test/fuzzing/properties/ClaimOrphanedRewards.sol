@@ -25,17 +25,24 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
     /// @custom:property CORE02 If toPay = reward manager address, it will revert
     /// @custom:property CORS01 After claim orphaned rewards, the toPay balance will increased by total orphaned rewards claimed
     /// @custom:property CORS02 After claim orphaned rewards, the orphaned rewards of pubkey is zero
-    function claimOrphanedRewards(
-        bytes[] calldata pubkeys
-    ) external {
+    function claimOrphanedRewards(uint256 pubkeyId1, uint256 pubkeyId2, uint256 pubkeyId3) external {
         // Pre-conditions
+        bytes memory pubkey1 = getRandomPubkey(pubkeyId1);
+        bytes memory pubkey2 = getRandomPubkey(pubkeyId2);
+        bytes memory pubkey3 = getRandomPubkey(pubkeyId3);
+
+        bytes[] memory pubkeyInputs = new bytes[](3);
+        pubkeyInputs[0] = pubkey1;
+        pubkeyInputs[1] = pubkey2;
+        pubkeyInputs[2] = pubkey3;
+
         ClaimOrphanedRewardsVars memory vars;
         vars.toPay = primev.owner;
 
         bool isZeroOrphanedRewards = false;
         uint256 totalOrphanedRewards = 0;
-        for (uint256 i = 0; i < pubkeys.length; i++) {
-            bytes memory pubkey = pubkeys[i];
+        for (uint256 i = 0; i < pubkeyInputs.length; i++) {
+            bytes memory pubkey = pubkeyInputs[i];
             if (claimOrphanedRewardsPubkeys[pubkey]) {
                 isZeroOrphanedRewards = true;
                 break;
@@ -53,7 +60,7 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
 
         // Action
         vm.prank(primev.owner);
-        try primev.rewardManager.claimOrphanedRewards(pubkeys, vars.toPay) {
+        try primev.rewardManager.claimOrphanedRewards(pubkeyInputs, vars.toPay) {
             // Post-conditions
             ClaimOrphanedRewardsSnapshot memory post = claimOrphanedRewardsSnapshot(vars);
 
@@ -62,8 +69,8 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
 
             t(post.toPayBalance == pre.toPayBalance + totalOrphanedRewards, "CORS01");
 
-            for (uint256 i = 0; i < pubkeys.length; i++) {
-                bytes memory pubkey = pubkeys[0];
+            for (uint256 i = 0; i < pubkeyInputs.length; i++) {
+                bytes memory pubkey = pubkeyInputs[0];
                 uint256 amount = primev.rewardManager.orphanedRewards(pubkey);
                 t(amount == 0, "CORS02");
             }
@@ -72,8 +79,8 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
         }
 
         // Clean up
-        for (uint256 i = 0; i < pubkeys.length; i++) {
-            bytes memory pubkey = pubkeys[i];
+        for (uint256 i = 0; i < pubkeyInputs.length; i++) {
+            bytes memory pubkey = pubkeyInputs[i];
             claimOrphanedRewardsPubkeys[pubkey] = false;
         }
     }

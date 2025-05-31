@@ -42,9 +42,10 @@ contract PayProposerProperties is BaseProperties {
     /// @custom:property PPS02 If Receiver Not Exists, orphaned rewards should be increased
     /// @custom:property PPS03 If Receiver exists, the logic should be correct
     function payProposer(
-        bytes memory pubkey
+        uint256 pubkeyId
     ) external payable {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         PayProposerVars memory vars;
         vars.pubkey = pubkey;
         vars.amountIn = msg.value;

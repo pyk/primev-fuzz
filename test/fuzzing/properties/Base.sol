@@ -17,6 +17,7 @@ contract BaseProperties is Setup {
     Deployment primev;
     mapping(address => bool) ethReceivers;
     address[] receivers;
+    bytes[] pubkeys;
 
     function setupReceivers() internal {
         // EOA that can receive ETH
@@ -65,11 +66,43 @@ contract BaseProperties is Setup {
         ethReceivers[receiver10] = false;
     }
 
+    function setupPubkeys() internal {
+        bytes memory pubkey1 =
+            hex"727896011037470273037918000728492843042888584323764058414553840142261816080802112727705947390421";
+        bytes memory pubkey2 =
+            hex"456487276974927710654050267992473836160878607847122414923904122178709187071860932005547181462043";
+        bytes memory pubkey3 =
+            hex"521499809578734129905492079071389085774986588888942793762309296294004395020358561485592888170917";
+        bytes memory pubkey4 =
+            hex"430241182680938050382334418146326959663000020371925558386674751162129452221638119655082997232439";
+        bytes memory pubkey5 = hex"00457449427901823843698387120075072714903117741401";
+        bytes memory pubkey6 = hex"58255185440734324471";
+        bytes memory pubkey7 =
+            hex"000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
+        pubkeys = new bytes[](8);
+        pubkeys[0] = hex"";
+        pubkeys[1] = pubkey1;
+        pubkeys[2] = pubkey2;
+        pubkeys[3] = pubkey3;
+        pubkeys[4] = pubkey4;
+        pubkeys[5] = pubkey5;
+        pubkeys[6] = pubkey6;
+        pubkeys[7] = pubkey7;
+    }
+
     function getRandomReceiver(
         uint256 id
     ) internal view returns (address receiver) {
         id = bound(id, 0, receivers.length - 1);
         receiver = receivers[id];
+    }
+
+    function getRandomPubkey(
+        uint256 id
+    ) internal view returns (bytes memory pubkey) {
+        id = bound(id, 0, pubkeys.length - 1);
+        pubkey = pubkeys[id];
     }
 
     function eq(uint256 a, uint256 b, string memory property) internal pure {

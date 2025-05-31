@@ -29,6 +29,7 @@ contract Fuzz is
 {
     constructor() {
         setupReceivers();
+        setupPubkeys();
         primev = deployContracts();
     }
 }

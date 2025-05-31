@@ -29,8 +29,9 @@ contract OverrideReceiverProperties is BaseProperties {
     /// @custom:property ORS01 If migrateExistingRewards=true, the unclaimed rewards of receiver should be zero and the unclaimed rewards of overrideAddress should be increased exactly by the unclaimed rewards of receiver
     /// @custom:property ORS02 If migrateExistingRewards=false, the unclaimed rewards of receiver and override addres should be the same as before operations
     /// @custom:property ORS03 The overrideAddress of receiver should be updated
-    function overrideReceiver(bytes memory pubkey, uint256 overrideAddressId, bool migrateExistingRewards) external {
+    function overrideReceiver(uint256 pubkeyId, uint256 overrideAddressId, bool migrateExistingRewards) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         address overrideAddress = getRandomReceiver(overrideAddressId);
         OverrideReceiverVars memory vars;
         address receiver = primev.rewardManager.findReceiver(pubkey);
@@ -95,8 +96,9 @@ contract OverrideReceiverProperties is BaseProperties {
     /// @custom:property ROAS01 If migrateExistingRewards=true, the unclaimed reward of removed override address will be moved to the receiver
     /// @custom:property ROAS02 If migrateExistingRewards=false, the unclaimed reward of removed override address and receiver address will be the same as before override address operation
     /// @custom:property ROAS03 After override address is removed, the overide address of receiver will be zero address
-    function removeOverrideAddress(bytes memory pubkey, bool migrateExistingRewards) external {
+    function removeOverrideAddress(uint256 pubkeyId, bool migrateExistingRewards) external {
         // Pre-conditions
+        bytes memory pubkey = getRandomPubkey(pubkeyId);
         RemoveOverrideAddressVars memory vars;
         address receiver = primev.rewardManager.findReceiver(pubkey);
         if (receiver == address(0)) return;
