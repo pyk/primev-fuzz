@@ -1,18 +1,29 @@
 // SPDX-License-Identifier: BSL 1.1
 pragma solidity 0.8.26;
 
-import { MockProperties } from "./properties/Mock.sol";
-import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
+// Admins
+import { ClaimOrphanedRewardsProperties } from "./properties/ClaimOrphanedRewards.sol";
 import { PauseProperties } from "./properties/Pause.sol";
+import { RemoveFromAutoClaimBlacklistProperties } from "./properties/RemoveFromAutoClaimBlacklist.sol";
+import { SetAutoClaimGasLimitProperties } from "./properties/SetAutoClaimGasLimit.sol";
+
+// Mocks
+import { MockProperties } from "./properties/Mock.sol";
+
+// Users
+import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
 import { PayProposerProperties } from "./properties/PayProposer.sol";
 import { RemoveOverrideAddressProperties } from "./properties/RemoveOverrideAddress.sol";
 
 contract Fuzz is
-    MockProperties,
+    ClaimOrphanedRewardsProperties,
     PauseProperties,
+    RemoveFromAutoClaimBlacklistProperties,
+    SetAutoClaimGasLimitProperties,
+    MockProperties,
     OverrideReceiverProperties,
-    RemoveOverrideAddressProperties,
-    PayProposerProperties
+    PayProposerProperties,
+    RemoveOverrideAddressProperties
 {
     constructor() {
         primev = deployContracts();
