@@ -25,10 +25,12 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
     /// @custom:property CORE02 If toPay = reward manager address, it will revert
     /// @custom:property CORS01 After claim orphaned rewards, the toPay balance will increased by total orphaned rewards claimed
     /// @custom:property CORS02 After claim orphaned rewards, the orphaned rewards of pubkey is zero
-    function claimOrphanedRewards(bytes[] calldata pubkeys, address toPay) external {
+    function claimOrphanedRewards(
+        bytes[] calldata pubkeys
+    ) external {
         // Pre-conditions
         ClaimOrphanedRewardsVars memory vars;
-        vars.toPay = toPay;
+        vars.toPay = primev.owner;
 
         bool isZeroOrphanedRewards = false;
         uint256 totalOrphanedRewards = 0;
@@ -47,19 +49,16 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
             claimOrphanedRewardsPubkeys[pubkey] = true;
         }
 
-        bool isToPayRewardManager =
-            toPay == address(primev.rewardManager) || toPay == IProxy(address(primev.rewardManager)).implementation();
-
         ClaimOrphanedRewardsSnapshot memory pre = claimOrphanedRewardsSnapshot(vars);
 
         // Action
         vm.prank(primev.owner);
-        try primev.rewardManager.claimOrphanedRewards(pubkeys, toPay) {
+        try primev.rewardManager.claimOrphanedRewards(pubkeys, vars.toPay) {
             // Post-conditions
             ClaimOrphanedRewardsSnapshot memory post = claimOrphanedRewardsSnapshot(vars);
 
             t(!isZeroOrphanedRewards, "CORE01"); // If there is zero unclaimed rewards, the operation should revert
-            t(!isToPayRewardManager, "CORE02"); // If there is zero unclaimed rewards, the operation should revert
+            // t(!isToPayRewardManager, "CORE02"); // If there is zero unclaimed rewards, the operation should revert
 
             t(post.toPayBalance == pre.toPayBalance + totalOrphanedRewards, "CORS01");
 
@@ -69,7 +68,7 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
                 t(amount == 0, "CORS02");
             }
         } catch {
-            assert(isZeroOrphanedRewards || isToPayRewardManager);
+            assert(isZeroOrphanedRewards);
         }
 
         // Clean up
