@@ -26,7 +26,7 @@ contract AutoClaimProperties is BaseProperties {
     /// @custom:property EACS01 If claimExistingRewards=true, the claimer balance will increased by exactly unclaimed rewards and the unclamed rewards of claimer should be zero
     /// @custom:property EACS02 If claimExistingRewards=false, the claimer balance and the unclaimed rewards should not change
     /// @custom:property EACS03 After enableAutoClaim. the autoClaim of claimer should set to true
-    function enableAutoClaim(address claimer, bool claimExistingRewards) external payable {
+    function enableAutoClaim(address claimer, bool claimExistingRewards) external {
         // Pre-conditions
         AutoClaimVars memory vars;
         vars.claimer = claimer;
@@ -59,6 +59,25 @@ contract AutoClaimProperties is BaseProperties {
             t(primev.rewardManager.autoClaim(claimer) == true, "EACS03");
         } catch {
             assert(isPaused || isClaimerRewardManager);
+        }
+    }
+
+    /// @custom:property DACE01 If contract is paused, disable auto claim operation should revert
+    /// @custom:property DACS01 After disable auto claim, the claimer auto claim should be disabled
+    function disableAutoClaim(
+        address claimer
+    ) external {
+        // Pre-conditions
+        bool isPaused = primev.rewardManager.paused();
+
+        // Action
+        vm.prank(claimer);
+        try primev.rewardManager.disableAutoClaim() {
+            // Post-conditions
+            t(!isPaused, "DACE01"); // If contract is paused, it should revert
+            t(primev.rewardManager.autoClaim(claimer) == false, "DACS01");
+        } catch {
+            assert(isPaused);
         }
     }
 }
