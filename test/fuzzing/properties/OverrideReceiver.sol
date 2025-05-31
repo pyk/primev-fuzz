@@ -24,6 +24,11 @@ contract OverrideReceiverProperties is BaseProperties {
         s.overrideAddress = primev.rewardManager.overrideAddresses(vars.receiver);
     }
 
+    /// @custom:proeprty ORE01 If contract is paused, override receiver operation should failed
+    /// @custom:property ORE02 If overrideAddress is zero address or same as receiver, override receiver operation should failed
+    /// @custom:property ORS01 If migrateExistingRewards=true, the unclaimed rewards of receiver should be zero and the unclaimed rewards of overrideAddress should be increased exactly by the unclaimed rewards of receiver
+    /// @custom:property ORS02 If migrateExistingRewards=false, the unclaimed rewards of receiver and override addres should be the same as before operations
+    /// @custom:property ORS03 The overrideAddress of receiver should be updated
     function overrideReceiver(bytes memory pubkey, address overrideAddress, bool migrateExistingRewards) external {
         // Pre-conditions
         OverrideReceiverVars memory vars;
@@ -44,17 +49,21 @@ contract OverrideReceiverProperties is BaseProperties {
             OverrideReceiverSnapshot memory post = overrideReceiverSnapshot(vars);
 
             // Post-conditions
-            t(!isInvalidAddress, "RMOR-E01"); // Invalid address should revert
-            t(!isPaused, "RMOR-E02"); // Paused should revert
+            t(!isPaused, "ORE01"); // Paused should revert
+            t(!isInvalidAddress, "ORE02"); // Invalid address should revert
 
-            t(post.overrideAddress == overrideAddress, "RMOR-S01"); // overrideAddresses should be set
             if (vars.migrateExistingRewards) {
-                t(post.receiverUnclaimedRewards == 0, "RMOR-S02");
-                t(post.newReceiverUnclaimedRewards == pre.receiverUnclaimedRewards, "RMOR-S03");
+                t(post.receiverUnclaimedRewards == 0, "ORS01");
+                t(
+                    post.newReceiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.newReceiverUnclaimedRewards,
+                    "ORS01"
+                );
             } else {
-                t(post.newReceiverUnclaimedRewards == pre.newReceiverUnclaimedRewards, "RMOR-S04");
-                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "RMOR-S05");
+                t(post.newReceiverUnclaimedRewards == pre.newReceiverUnclaimedRewards, "ORS02");
+                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ORS02");
             }
+
+            t(post.overrideAddress == overrideAddress, "ORS03"); // overrideAddresses should be set
         } catch {
             assert(isInvalidAddress || isPaused);
         }
