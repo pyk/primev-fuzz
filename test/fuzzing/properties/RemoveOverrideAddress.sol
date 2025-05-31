@@ -6,6 +6,7 @@ import { BaseProperties } from "./Base.sol";
 contract RemoveOverrideAddressProperties is BaseProperties {
     struct RemoveOverrideAddressVars {
         address receiver;
+        address existingOverrideAddress;
         bool migrateExistingRewards;
     }
 
@@ -19,11 +20,15 @@ contract RemoveOverrideAddressProperties is BaseProperties {
         RemoveOverrideAddressVars memory vars
     ) internal view returns (RemoveOverrideAddressSnapshot memory s) {
         s.overrideAddress = primev.rewardManager.overrideAddresses(vars.receiver);
-
-        s.overrideUnclaimedRewards = primev.rewardManager.unclaimedRewards(s.overrideAddress);
         s.receiverUnclaimedRewards = primev.rewardManager.unclaimedRewards(vars.receiver);
+        s.overrideUnclaimedRewards = primev.rewardManager.unclaimedRewards(vars.existingOverrideAddress);
     }
 
+    /// @custom:property ROA-E01 If there is no existing override address, the override address removal will be failed
+    /// @custom:property ROA-E02 If contract is paused, the override address removal will be failed
+    /// @custom:property ROA-S01 If migrateExistingRewards=true, the unclaimed reward of removed override address will be moved to the receiver
+    /// @custom:property ROA-S02 If migrateExistingRewards=false, the unclaimed reward of removed override address and receiver address will be the same as before override address operation
+    /// @custom:property ROA-S03 After override address is removed, the overide address of receiver will be zero address
     function removeOverrideAddress(bytes memory pubkey, bool migrateExistingRewards) external {
         // Pre-conditions
         RemoveOverrideAddressVars memory vars;
@@ -31,9 +36,10 @@ contract RemoveOverrideAddressProperties is BaseProperties {
         if (receiver == address(0)) return;
         vars.receiver = receiver;
         vars.migrateExistingRewards = migrateExistingRewards;
+        vars.existingOverrideAddress = primev.rewardManager.overrideAddresses(vars.receiver);
 
         RemoveOverrideAddressSnapshot memory pre = removeOverrideAddressSnapshot(vars);
-        bool isNoOverriddenAddressToRemove = pre.overrideAddress == address(0);
+        bool isNoOverriddenAddressToRemove = vars.existingOverrideAddress == address(0);
         bool isPaused = primev.rewardManager.paused();
 
         // Action
@@ -42,17 +48,21 @@ contract RemoveOverrideAddressProperties is BaseProperties {
             RemoveOverrideAddressSnapshot memory post = removeOverrideAddressSnapshot(vars);
 
             // Post-conditions
-            t(!isNoOverriddenAddressToRemove, "RMROA-E01"); // If no overrideAddress, then it should revert
-            t(!isPaused, "RMROA-E02"); // Paused should revert
+            t(!isNoOverriddenAddressToRemove, "ROA-E01"); // If no overrideAddress, then it should revert
+            t(!isPaused, "ROA-E02"); // If contract is paused, then it should revert
 
-            t(post.overrideAddress == address(0), "RMROA-S01"); // overrideAddresses should be set to zero
             if (vars.migrateExistingRewards) {
-                t(post.overrideUnclaimedRewards == 0, "RMROA-S02");
-                t(post.receiverUnclaimedRewards == pre.overrideUnclaimedRewards, "RMROA-S03");
+                t(post.overrideUnclaimedRewards == 0, "ROA-S01");
+                t(
+                    post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.overrideUnclaimedRewards,
+                    "ROA-S01"
+                );
             } else {
-                t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "RMROA-S04");
-                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "RMROA-S05");
+                t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "ROA-S02");
+                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ROA-S02");
             }
+
+            t(post.overrideAddress == address(0), "ROA-S01"); // overrideAddresses should be set to zero
         } catch {
             assert(isNoOverriddenAddressToRemove || isPaused);
         }
