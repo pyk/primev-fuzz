@@ -11,6 +11,7 @@ import { SetAutoClaimGasLimitProperties } from "./properties/SetAutoClaimGasLimi
 import { MockProperties } from "./properties/Mock.sol";
 
 // Users
+import { AutoClaimProperties } from "./properties/AutoClaim.sol";
 import { ClaimRewardsProperties } from "./properties/ClaimRewards.sol";
 import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
 import { PayProposerProperties } from "./properties/PayProposer.sol";
@@ -22,6 +23,7 @@ contract Fuzz is
     RemoveFromAutoClaimBlacklistProperties,
     SetAutoClaimGasLimitProperties,
     MockProperties,
+    AutoClaimProperties,
     ClaimRewardsProperties,
     OverrideReceiverProperties,
     PayProposerProperties,
