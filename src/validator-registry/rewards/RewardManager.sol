@@ -285,6 +285,7 @@ contract RewardManager is
 
         // @audit modified source code
         IMevCommitMiddleware.ValidatorRecord memory validatorRecord = _mevCommitMiddleware.validatorRecords(pubkey);
+        // @audit there is operator and vault not sure what's the different
         if (validatorRecord.exists && validatorRecord.operator != address(0)) {
             return validatorRecord.operator;
         }
