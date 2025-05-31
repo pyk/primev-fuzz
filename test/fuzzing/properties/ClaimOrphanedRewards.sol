@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: BSL 1.1
 pragma solidity 0.8.26;
 
+import { IProxy } from "../interfaces/IProxy.sol";
 import { BaseProperties } from "./Base.sol";
-
-interface IProxy {
-    function implementation() external returns (address);
-}
 
 contract ClaimOrphanedRewardsProperties is BaseProperties {
     mapping(bytes => bool) claimOrphanedRewardsPubkeys;

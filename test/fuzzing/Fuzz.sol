@@ -11,6 +11,7 @@ import { SetAutoClaimGasLimitProperties } from "./properties/SetAutoClaimGasLimi
 import { MockProperties } from "./properties/Mock.sol";
 
 // Users
+import { ClaimRewardsProperties } from "./properties/ClaimRewards.sol";
 import { OverrideReceiverProperties } from "./properties/OverrideReceiver.sol";
 import { PayProposerProperties } from "./properties/PayProposer.sol";
 import { RemoveOverrideAddressProperties } from "./properties/RemoveOverrideAddress.sol";
@@ -21,6 +22,7 @@ contract Fuzz is
     RemoveFromAutoClaimBlacklistProperties,
     SetAutoClaimGasLimitProperties,
     MockProperties,
+    ClaimRewardsProperties,
     OverrideReceiverProperties,
     PayProposerProperties,
     RemoveOverrideAddressProperties
@@ -28,4 +30,7 @@ contract Fuzz is
     constructor() {
         primev = deployContracts();
     }
+
+    /// @dev Allows to receive random eth from fuzzing squence
+    receive() external payable { }
 }
