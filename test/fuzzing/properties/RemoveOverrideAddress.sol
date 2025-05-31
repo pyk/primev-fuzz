@@ -24,11 +24,11 @@ contract RemoveOverrideAddressProperties is BaseProperties {
         s.overrideUnclaimedRewards = primev.rewardManager.unclaimedRewards(vars.existingOverrideAddress);
     }
 
-    /// @custom:property ROA-E01 If there is no existing override address, the override address removal will be failed
-    /// @custom:property ROA-E02 If contract is paused, the override address removal will be failed
-    /// @custom:property ROA-S01 If migrateExistingRewards=true, the unclaimed reward of removed override address will be moved to the receiver
-    /// @custom:property ROA-S02 If migrateExistingRewards=false, the unclaimed reward of removed override address and receiver address will be the same as before override address operation
-    /// @custom:property ROA-S03 After override address is removed, the overide address of receiver will be zero address
+    /// @custom:property ROAE01 If there is no existing override address, the override address removal will be failed
+    /// @custom:property ROAE02 If contract is paused, the override address removal will be failed
+    /// @custom:property ROAS01 If migrateExistingRewards=true, the unclaimed reward of removed override address will be moved to the receiver
+    /// @custom:property ROAS02 If migrateExistingRewards=false, the unclaimed reward of removed override address and receiver address will be the same as before override address operation
+    /// @custom:property ROAS03 After override address is removed, the overide address of receiver will be zero address
     function removeOverrideAddress(bytes memory pubkey, bool migrateExistingRewards) external {
         // Pre-conditions
         RemoveOverrideAddressVars memory vars;
@@ -48,21 +48,21 @@ contract RemoveOverrideAddressProperties is BaseProperties {
             RemoveOverrideAddressSnapshot memory post = removeOverrideAddressSnapshot(vars);
 
             // Post-conditions
-            t(!isNoOverriddenAddressToRemove, "ROA-E01"); // If no overrideAddress, then it should revert
-            t(!isPaused, "ROA-E02"); // If contract is paused, then it should revert
+            t(!isNoOverriddenAddressToRemove, "ROAE01"); // If no overrideAddress, then it should revert
+            t(!isPaused, "ROAE02"); // If contract is paused, then it should revert
 
             if (vars.migrateExistingRewards) {
-                t(post.overrideUnclaimedRewards == 0, "ROA-S01");
+                t(post.overrideUnclaimedRewards == 0, "ROAS01");
                 t(
                     post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.overrideUnclaimedRewards,
-                    "ROA-S01"
+                    "ROAS01"
                 );
             } else {
-                t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "ROA-S02");
-                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ROA-S02");
+                t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "ROAS02");
+                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ROAS02");
             }
 
-            t(post.overrideAddress == address(0), "ROA-S01"); // overrideAddresses should be set to zero
+            t(post.overrideAddress == address(0), "ROAS03"); // overrideAddresses should be set to zero
         } catch {
             assert(isNoOverriddenAddressToRemove || isPaused);
         }
