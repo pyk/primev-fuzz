@@ -79,50 +79,16 @@ contract RewardManager is
     function payProposer(
         bytes calldata pubkey
     ) external payable onlyValidBLSPubKey(pubkey) nonReentrant {
-        // MODIFIER 1: onlyValidBLSPubKey
-        // BRANCH 1.1: pubkey.length != 48 -> Reverts with InvalidBLSPubKeyLength
-        // BRANCH 1.2: pubkey.length == 48 -> Proceeds
-
-        // Intentionally don't allow pausing. (No branch here, just a note)
-
-        // REQUIREMENT 1:
-        // BRANCH 2.1: msg.value == 0 -> Reverts with NoEthPayable
-        // BRANCH 2.2: msg.value != 0 -> Proceeds
-
         // Intentionally don't allow pausing.
-
         require(msg.value != 0, NoEthPayable());
 
-        // _findReceiver LOGIC (internal branching, impacts `receiver` value):
-        //   SUB-BRANCH A: Found in MevCommitMiddlewareMock (validatorRecord.exists && validatorRecord.operator != address(0))
-        //                 -> receiver = validatorRecord.operator
-        //   SUB-BRANCH B: Not in Middleware, Found in VanillaRegistryMock (stakedValidator.exists && stakedValidator.withdrawalAddress != address(0))
-        //                 -> receiver = stakedValidator.withdrawalAddress
-        //   SUB-BRANCH C: Not in Middleware or Vanilla, Found in MevCommitAVSMock (validatorInfo.exists && validatorInfo.podOwner != address(0))
-        //                 -> receiver = validatorInfo.podOwner
-        //   SUB-BRANCH D: Not found in any registry
-        //                 -> receiver = address(0)
         address receiver = _findReceiver(pubkey);
 
-        // BRANCH 3 (based on `_findReceiver` result):
-        // BRANCH 3.1: receiver == address(0) (Pubkey not registered / receiver not determinable)
-        //   - orphanedRewards[pubkey] += msg.value;
-        //   - emit OrphanedRewardsAccumulated(msg.sender, pubkey, msg.value);
-        //   - RETURN
-        // BRANCH 3.2: receiver != address(0) (Pubkey registered, receiver found) -> Proceeds
         if (receiver == address(0)) {
             orphanedRewards[pubkey] += msg.value;
             emit OrphanedRewardsAccumulated(msg.sender, pubkey, msg.value);
             return;
         }
-
-        // BRANCH 4: Override address check
-        // BRANCH 4.1: overrideAddr != address(0)
-        //   - toPay = overrideAddr;
-        // BRANCH 4.2: overrideAddr == address(0) -> `toPay` remains `receiver`
-
-        // BRANCH 5: Auto-claim check (depends on original `receiver`, not `toPay`)
-        // BRANCH 5.1: autoClaim[receiver] && !autoClaimBlacklist[receiver] (Auto-claim is active)
 
         address toPay = receiver;
         address overrideAddr = overrideAddresses[receiver];
