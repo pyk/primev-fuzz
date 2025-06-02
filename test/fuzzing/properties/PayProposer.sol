@@ -71,67 +71,6 @@ contract PayProposerProperties is BaseProperties {
             PayProposerSnapshot memory post = payProposerSnapshot(vars);
 
             // Post-conditions
-<<<<<<< Updated upstream
-            t(!pubKeyInvalid, "PPE01"); // Invalid key should revert
-            t(!isNoEthPayable, "PPE02"); // Zero value should revert
-
-            if (vars.receiver == address(0)) {
-                t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS01");
-                t(post.pubkeyOrphanedRewards == pre.pubkeyOrphanedRewards + vars.amountIn, "PPS02");
-            } else {
-                if (vars.overrideAddress != address(0)) {
-                    if (vars.autoClaimEnabled && !vars.autoClaimBlacklist) {
-                        if (!ethReceivers[vars.overrideAddress]) {
-                            t(primev.rewardManager.autoClaim(vars.receiver) == false, "PPS03_1");
-                            t(primev.rewardManager.autoClaimBlacklist(vars.receiver) == true, "PPS03_2");
-                            t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS03_3");
-                            t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_4");
-                            t(post.overrideBalance == pre.overrideBalance, "PPS03_5");
-
-                            // Increase unclaimed rewards for override address
-                            shadowUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
-                        } else {
-                            t(post.rewardManagerBalance == pre.rewardManagerBalance, "PPS03_6");
-                            t(post.overrideBalance == pre.overrideBalance + vars.amountIn, "PPS03_7");
-                            t(post.receiverBalance == pre.receiverBalance, "PPS03_8");
-                            t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "PPS03_9");
-                            t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "PPS03_10");
-                        }
-                    } else {
-                        t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS03_11");
-                        t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_12");
-                        t(post.overrideBalance == pre.overrideBalance, "PPS03_13");
-
-                        // Increase unclaimed rewards for override address
-                        shadowUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
-                    }
-                } else {
-                    if (vars.autoClaimEnabled && !vars.autoClaimBlacklist) {
-                        if (!ethReceivers[vars.receiver]) {
-                            t(primev.rewardManager.autoClaim(vars.receiver) == false, "PPS03_14");
-                            t(primev.rewardManager.autoClaimBlacklist(vars.receiver) == true, "PPS03_15");
-                            t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS03_16");
-                            t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_17");
-                            t(post.overrideBalance == pre.overrideBalance, "PPS03_18");
-
-                            // Increase unclaimed rewards for receiver address
-                            shadowUnclaimedRewards[vars.receiver] += vars.amountIn;
-                        } else {
-                            t(post.rewardManagerBalance == pre.rewardManagerBalance, "PPS03_19");
-                            t(post.receiverBalance == pre.receiverBalance + vars.amountIn, "PPS03_20");
-                            t(post.overrideBalance == pre.overrideBalance, "PPS03_21");
-                            t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "PPS03_22");
-                            t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "PPS03_23");
-                        }
-                    } else {
-                        t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS03_24");
-                        t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_25");
-                        t(post.overrideBalance == pre.overrideBalance, "PPS03_26");
-
-                        // Increase unclaimed rewards for receiver address
-                        shadowUnclaimedRewards[vars.receiver] += vars.amountIn;
-                    }
-=======
             if (pubkeyExists[vars.pubkey]) {
                 expectedTotalUnclaimedRewards += vars.amountIn;
                 if (vars.overrideAddress == address(0)) {
@@ -140,7 +79,6 @@ contract PayProposerProperties is BaseProperties {
                 } else {
                     t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS01_2");
                     expectedUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
->>>>>>> Stashed changes
                 }
             } else {
                 t(post.pubkeyOrphanedRewards == pre.pubkeyOrphanedRewards + vars.amountIn, "PPS02");

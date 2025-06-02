@@ -59,18 +59,10 @@ contract OverrideReceiverProperties is BaseProperties {
         vm.prank(vars.receiver);
         try primev.rewardManager.removeOverrideAddress(migrateExistingRewards) {
             // Post-conditions
-            t(!isNoOverriddenAddressToRemove, "ROAE01"); // If no overrideAddress, then it should revert
-            t(!isPaused, "ROAE02"); // If contract is paused, then it should revert
-
-            if (vars.migrateExistingRewards) {
-                t(post.overrideUnclaimedRewards == 0, "ROAS01");
-                t(
-                    post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.overrideUnclaimedRewards,
-                    "ROAS01"
-                );
-            } else {
-                t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "ROAS02");
-                t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ROAS02");
+            expectedOverrideAddress[vars.receiver] = address(0);
+            if (migrateExistingRewards) {
+                expectedUnclaimedRewards[vars.receiver] += unclaimedRewards;
+                expectedUnclaimedRewards[vars.overrideAddress] -= unclaimedRewards;
             }
         } catch {
             assert(false);

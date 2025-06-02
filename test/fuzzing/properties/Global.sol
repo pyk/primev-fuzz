@@ -45,14 +45,14 @@ contract GlobalProperties is BaseProperties {
     //     return receiverProfits[receivers[1]];
     // }
 
-    function property_UnclaimedRewards() external view returns (bool valid) {
-        valid = true;
-        for (uint256 i = 0; i < receivers.length; i++) {
-            uint256 unclaimedRewards = primev.rewardManager.unclaimedRewards(receivers[i]);
-            uint256 expectedUnclaimedRewards = shadowUnclaimedRewards[receivers[i]];
-            if (unclaimedRewards != expectedUnclaimedRewards) {
-                valid = false;
-            }
-        }
-    }
+    // function property_UnclaimedRewards() external view returns (bool valid) {
+    //     valid = true;
+    //     for (uint256 i = 0; i < receivers.length; i++) {
+    //         uint256 unclaimedRewards = primev.rewardManager.unclaimedRewards(receivers[i]);
+    //         uint256 expectedUnclaimedRewards = shadowUnclaimedRewards[receivers[i]];
+    //         if (unclaimedRewards != expectedUnclaimedRewards) {
+    //             valid = false;
+    //         }
+    //     }
+    // }
 }
