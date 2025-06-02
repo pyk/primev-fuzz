@@ -6,7 +6,7 @@ import { BaseProperties } from "./Base.sol";
 contract PauseProperties is BaseProperties {
     /// @custom:property PAE01 If contract is paused, the operation will revert
     /// @custom:property PAS01 After pause, the contract is paused
-    function pause() external payable {
+    function pause() external {
         // Pre-conditions
         bool isEnforcedPause = primev.rewardManager.paused();
 
@@ -22,7 +22,7 @@ contract PauseProperties is BaseProperties {
 
     /// @custom:property UPE01 If contact is not paused, the operation will revert
     /// @custom:property UPS01 After unpause, the contract is not paused
-    function unpause() external payable {
+    function unpause() external {
         // Pre-conditions
         bool isExpectedPause = primev.rewardManager.paused();
 

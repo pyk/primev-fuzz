@@ -27,9 +27,9 @@ contract ClaimOrphanedRewardsProperties is BaseProperties {
     /// @custom:property CORS02 After claim orphaned rewards, the orphaned rewards of pubkey is zero
     function claimOrphanedRewards(uint256 pubkeyId1, uint256 pubkeyId2, uint256 pubkeyId3) external {
         // Pre-conditions
-        bytes memory pubkey1 = getRandomPubkey(pubkeyId1);
-        bytes memory pubkey2 = getRandomPubkey(pubkeyId2);
-        bytes memory pubkey3 = getRandomPubkey(pubkeyId3);
+        bytes memory pubkey1 = getPubkey(pubkeyId1);
+        bytes memory pubkey2 = getPubkey(pubkeyId2);
+        bytes memory pubkey3 = getPubkey(pubkeyId3);
 
         bytes[] memory pubkeyInputs = new bytes[](3);
         pubkeyInputs[0] = pubkey1;

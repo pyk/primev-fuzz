@@ -5,16 +5,40 @@ import { BaseProperties } from "./Base.sol";
 
 contract GlobalProperties is BaseProperties {
     function property_RewardManager_balance() external view returns (bool) {
-        uint256 sum = 0;
-        for (uint256 i = 0; i < pubkeys.length; i++) {
-            sum += primev.rewardManager.orphanedRewards(pubkeys[i]);
-        }
-        for (uint256 i = 0; i < receivers.length; i++) {
-            sum += primev.rewardManager.unclaimedRewards(receivers[i]);
-        }
         uint256 balance = address(primev.rewardManager).balance;
+        return balance == expectedTotalOrphanedRewards + expectedTotalUnclaimedRewards;
+    }
 
-        return sum == balance;
+    function property_UnclaimedRewards() external view returns (bool) {
+        for (uint256 i = 0; i < pubkeys.length; i++) {
+            address receiver = pubkeyReceivers[pubkeys[i]];
+            uint256 unclaimedRewards = primev.rewardManager.unclaimedRewards(receiver);
+            if (unclaimedRewards != expectedUnclaimedRewards[receiver]) {
+                return false;
+            }
+        }
+
+        for (uint256 i = 0; i < overrides.length; i++) {
+            uint256 unclaimedRewards = primev.rewardManager.unclaimedRewards(overrides[i]);
+            if (unclaimedRewards != expectedUnclaimedRewards[overrides[i]]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function property_OrphanedRewards() external view returns (bool) {
+        for (uint256 i = 0; i < pubkeys.length; i++) {
+            bytes memory pubkey = pubkeys[i];
+            if (pubkeyExists[pubkey]) continue;
+            uint256 rewards = primev.rewardManager.orphanedRewards(pubkey);
+            if (rewards != expectedOrphanedRewards[pubkey]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // function optimize_Receiver_profit() external view returns (int256) {

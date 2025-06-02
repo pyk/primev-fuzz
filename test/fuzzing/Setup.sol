@@ -6,31 +6,29 @@ import { Test, console } from "forge-std/Test.sol";
 
 import { RewardManager } from "src/validator-registry/rewards/RewardManager.sol";
 
-import { MevCommitAVSMock } from "./mocks/MevCommitAVSMock.sol";
-import { MevCommitMiddlewareMock } from "./mocks/MevCommitMiddlewareMock.sol";
-import { VanillaRegistryMock } from "./mocks/VanillaRegistryMock.sol";
+import { MevCommitAVSMock } from "src/validator-registry/rewards/mocks/MevCommitAVSMock.sol";
+import { MevCommitMiddlewareMock } from "src/validator-registry/rewards/mocks/MevCommitMiddlewareMock.sol";
+import { VanillaRegistryMock } from "src/validator-registry/rewards/mocks/VanillaRegistryMock.sol";
 
 contract Setup is Test {
-    uint256 maxValidators = 5;
-
     struct Deployment {
         address owner;
+        MevCommitMiddlewareMock mevCommitMiddleware;
         VanillaRegistryMock vanillaRegistry;
         MevCommitAVSMock mevCommitAVS;
-        MevCommitMiddlewareMock mevCommitMiddleware;
         RewardManager rewardManager;
     }
 
     function deployVanillaRegistryMock() internal returns (VanillaRegistryMock deployment) {
-        deployment = new VanillaRegistryMock(maxValidators);
+        deployment = new VanillaRegistryMock();
     }
 
     function deployMevCommitAVSMock() internal returns (MevCommitAVSMock deployment) {
-        deployment = new MevCommitAVSMock(maxValidators);
+        deployment = new MevCommitAVSMock();
     }
 
     function deployMevCommitMiddlewareMock() internal returns (MevCommitMiddlewareMock deployment) {
-        deployment = new MevCommitMiddlewareMock(maxValidators);
+        deployment = new MevCommitMiddlewareMock();
     }
 
     function deployRewardManager(
@@ -54,8 +52,6 @@ contract Setup is Test {
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), data);
         deployment = RewardManager(payable(address(proxy)));
         vm.label(address(deployment), "RewardManagerProxy");
-
-        //
     }
 
     function deployContracts() internal returns (Deployment memory deployment) {

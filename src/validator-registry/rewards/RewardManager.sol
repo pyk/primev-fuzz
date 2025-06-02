@@ -6,10 +6,11 @@ import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
-import { IMevCommitAVS } from "../../interfaces/IMevCommitAVS.sol";
-import { IMevCommitMiddleware } from "../../interfaces/IMevCommitMiddleware.sol";
 import { IRewardManager } from "../../interfaces/IRewardManager.sol";
-import { IVanillaRegistry } from "../../interfaces/IVanillaRegistry.sol";
+
+import { MevCommitAVSMock } from "./mocks/MevCommitAVSMock.sol";
+import { MevCommitMiddlewareMock } from "./mocks/MevCommitMiddlewareMock.sol";
+import { VanillaRegistryMock } from "./mocks/VanillaRegistryMock.sol";
 
 import { Errors } from "../../utils/Errors.sol";
 import { RewardManagerStorage } from "./RewardManagerStorage.sol";
@@ -243,7 +244,7 @@ contract RewardManager is
         address vanillaRegistry
     ) internal {
         require(vanillaRegistry != address(0), InvalidAddress());
-        _vanillaRegistry = IVanillaRegistry(vanillaRegistry);
+        _vanillaRegistry = VanillaRegistryMock(vanillaRegistry);
         emit VanillaRegistrySet(vanillaRegistry);
     }
 
@@ -251,7 +252,7 @@ contract RewardManager is
         address mevCommitAVS
     ) internal {
         require(mevCommitAVS != address(0), InvalidAddress());
-        _mevCommitAVS = IMevCommitAVS(mevCommitAVS);
+        _mevCommitAVS = MevCommitAVSMock(mevCommitAVS);
         emit MevCommitAVSSet(mevCommitAVS);
     }
 
@@ -259,7 +260,7 @@ contract RewardManager is
         address mevCommitMiddleware
     ) internal {
         require(mevCommitMiddleware != address(0), InvalidAddress());
-        _mevCommitMiddleware = IMevCommitMiddleware(mevCommitMiddleware);
+        _mevCommitMiddleware = MevCommitMiddlewareMock(mevCommitMiddleware);
         emit MevCommitMiddlewareSet(mevCommitMiddleware);
     }
 
@@ -278,49 +279,21 @@ contract RewardManager is
         bytes calldata pubkey
     ) internal view returns (address) {
         // Original lines
-        // (, address operatorAddr, bool existsMiddleware,) = _mevCommitMiddleware.validatorRecords(pubkey);
-        // if (existsMiddleware && operatorAddr != address(0)) {
-        //     return operatorAddr;
-        // }
-
-        // @audit modified source code
-        IMevCommitMiddleware.ValidatorRecord memory validatorRecord = _mevCommitMiddleware.validatorRecords(pubkey);
-        // @audit there is operator and vault not sure what's the different
-        if (validatorRecord.exists && validatorRecord.operator != address(0)) {
-            return validatorRecord.operator;
+        (, address operatorAddr, bool existsMiddleware,) = _mevCommitMiddleware.validatorRecords(pubkey);
+        if (existsMiddleware && operatorAddr != address(0)) {
+            return operatorAddr;
         }
 
-        // Original lines
-        // (bool existsVanilla, address vanillaWithdrawalAddr,,) = _vanillaRegistry.stakedValidators(pubkey);
-        // if (existsVanilla && vanillaWithdrawalAddr != address(0)) {
-        //     return vanillaWithdrawalAddr;
-        // }
-
-        // @audit modified source code
-        IVanillaRegistry.StakedValidator memory stakedValidator = _vanillaRegistry.stakedValidators(pubkey);
-        if (stakedValidator.exists && stakedValidator.withdrawalAddress != address(0)) {
-            return stakedValidator.withdrawalAddress;
+        (bool existsVanilla, address vanillaWithdrawalAddr,,) = _vanillaRegistry.stakedValidators(pubkey);
+        if (existsVanilla && vanillaWithdrawalAddr != address(0)) {
+            return vanillaWithdrawalAddr;
         }
 
-        // Original lines
-        // (bool existsAvs, address podOwner,,) = _mevCommitAVS.validatorRegistrations(pubkey);
-        // if (existsAvs && podOwner != address(0)) {
-        //     return podOwner;
-        // }
-
-        // @audit modified source code
-        IMevCommitAVS.ValidatorRegistrationInfo memory validatorInfo = _mevCommitAVS.validatorRegistrations(pubkey);
-        if (validatorInfo.exists && validatorInfo.podOwner != address(0)) {
-            return validatorInfo.podOwner;
+        (bool existsAvs, address podOwner,,) = _mevCommitAVS.validatorRegistrations(pubkey);
+        if (existsAvs && podOwner != address(0)) {
+            return podOwner;
         }
 
         return address(0);
-    }
-
-    // @audit Helper function for fuzz testing
-    function findReceiver(
-        bytes calldata pubkey
-    ) external view returns (address receiver) {
-        receiver = _findReceiver(pubkey);
     }
 }

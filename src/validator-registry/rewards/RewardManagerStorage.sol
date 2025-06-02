@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: BSL 1.1
 pragma solidity 0.8.26;
 
-import { IMevCommitAVS } from "../../interfaces/IMevCommitAVS.sol";
-import { IMevCommitMiddleware } from "../../interfaces/IMevCommitMiddleware.sol";
-import { IVanillaRegistry } from "../../interfaces/IVanillaRegistry.sol";
+import { MevCommitAVSMock } from "./mocks/MevCommitAVSMock.sol";
+import { MevCommitMiddlewareMock } from "./mocks/MevCommitMiddlewareMock.sol";
+import { VanillaRegistryMock } from "./mocks/VanillaRegistryMock.sol";
 
 contract RewardManagerStorage {
     /// Storage reference to the VanillaRegistry contract.
-    IVanillaRegistry internal _vanillaRegistry;
+    VanillaRegistryMock internal _vanillaRegistry;
 
     /// Storage reference to the MevCommitAVS contract.
-    IMevCommitAVS internal _mevCommitAVS;
+    MevCommitAVSMock internal _mevCommitAVS;
 
     /// Storage reference to the MevCommitMiddleware contract.
-    IMevCommitMiddleware internal _mevCommitMiddleware;
+    MevCommitMiddlewareMock internal _mevCommitMiddleware;
 
     /// @dev Gas limit for forwarded auto-claim calls.
     uint256 public autoClaimGasLimit;
