@@ -16,7 +16,13 @@ import { PayProposerProperties } from "./properties/PayProposer.sol";
 // Global
 import { GlobalProperties } from "./properties/Global.sol";
 
-contract Fuzz is PauseProperties, PayProposerProperties, GlobalProperties, OverrideReceiverProperties {
+contract Fuzz is
+    PauseProperties,
+    PayProposerProperties,
+    GlobalProperties,
+    OverrideReceiverProperties,
+    AutoClaimProperties
+{
     constructor() {
         // setupReceivers();
         primev = deployContracts();

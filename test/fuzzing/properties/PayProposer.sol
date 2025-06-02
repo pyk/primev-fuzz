@@ -49,13 +49,15 @@ contract PayProposerProperties is BaseProperties {
 
             // Post-conditions
             if (pubkeyExists[vars.pubkey]) {
-                expectedTotalUnclaimedRewards += vars.amountIn;
-                if (vars.overrideAddress == address(0)) {
-                    t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS01_1");
-                    expectedUnclaimedRewards[vars.receiver] += vars.amountIn;
-                } else {
-                    t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS01_2");
-                    expectedUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
+                if (expectedAutoClaim[vars.receiver] == false) {
+                    expectedTotalUnclaimedRewards += vars.amountIn;
+                    if (vars.overrideAddress == address(0)) {
+                        t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS01_1");
+                        expectedUnclaimedRewards[vars.receiver] += vars.amountIn;
+                    } else {
+                        t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS01_2");
+                        expectedUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
+                    }
                 }
             } else {
                 t(post.pubkeyOrphanedRewards == pre.pubkeyOrphanedRewards + vars.amountIn, "PPS02");

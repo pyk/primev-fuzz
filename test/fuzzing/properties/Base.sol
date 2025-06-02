@@ -34,6 +34,9 @@ contract BaseProperties is Setup {
     address[] overrides;
     mapping(address receiver => address overrideAddress) expectedOverrideAddress;
 
+    // Shadow variables to track autoclaim
+    mapping(address receiver => bool status) expectedAutoClaim;
+
     function setupPubkeys() internal {
         // Setup MevCommitMiddleware
         bytes memory pubkey1 =
