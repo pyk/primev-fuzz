@@ -80,6 +80,9 @@ contract PayProposerProperties is BaseProperties {
                             t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS03_3");
                             t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_4");
                             t(post.overrideBalance == pre.overrideBalance, "PPS03_5");
+
+                            // Increase unclaimed rewards for override address
+                            shadowUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
                         } else {
                             t(post.rewardManagerBalance == pre.rewardManagerBalance, "PPS03_6");
                             t(post.overrideBalance == pre.overrideBalance + vars.amountIn, "PPS03_7");
@@ -91,6 +94,9 @@ contract PayProposerProperties is BaseProperties {
                         t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards + vars.amountIn, "PPS03_11");
                         t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_12");
                         t(post.overrideBalance == pre.overrideBalance, "PPS03_13");
+
+                        // Increase unclaimed rewards for override address
+                        shadowUnclaimedRewards[vars.overrideAddress] += vars.amountIn;
                     }
                 } else {
                     if (vars.autoClaimEnabled && !vars.autoClaimBlacklist) {
@@ -100,6 +106,9 @@ contract PayProposerProperties is BaseProperties {
                             t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS03_16");
                             t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_17");
                             t(post.overrideBalance == pre.overrideBalance, "PPS03_18");
+
+                            // Increase unclaimed rewards for receiver address
+                            shadowUnclaimedRewards[vars.receiver] += vars.amountIn;
                         } else {
                             t(post.rewardManagerBalance == pre.rewardManagerBalance, "PPS03_19");
                             t(post.receiverBalance == pre.receiverBalance + vars.amountIn, "PPS03_20");
@@ -111,6 +120,9 @@ contract PayProposerProperties is BaseProperties {
                         t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + vars.amountIn, "PPS03_24");
                         t(post.rewardManagerBalance == pre.rewardManagerBalance + vars.amountIn, "PPS03_25");
                         t(post.overrideBalance == pre.overrideBalance, "PPS03_26");
+
+                        // Increase unclaimed rewards for receiver address
+                        shadowUnclaimedRewards[vars.receiver] += vars.amountIn;
                     }
                 }
             }

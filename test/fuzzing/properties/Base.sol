@@ -19,6 +19,9 @@ contract BaseProperties is Setup {
     address[] receivers;
     bytes[] pubkeys;
 
+    // mapping(address receiver => int256 profit) receiverProfits;
+    mapping(address => uint256) shadowUnclaimedRewards;
+
     function setupReceivers() internal {
         // EOA that can receive ETH
         address receiver1 = makeAddr("receiver1");

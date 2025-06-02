@@ -48,6 +48,9 @@ contract ClaimRewardsProperties is BaseProperties {
 
             t(post.claimerBalance == pre.claimerBalance + pre.unclaimedRewards, "CRS01");
             t(post.unclaimedRewards == 0, "CRS02");
+
+            // Decreases unclaimed rewards for msg.sender
+            shadowUnclaimedRewards[vars.claimer] -= pre.unclaimedRewards;
         } catch {
             assert(isPaused || isClaimerCannotReceiveEther);
         }

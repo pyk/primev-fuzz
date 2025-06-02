@@ -49,6 +49,9 @@ contract AutoClaimProperties is BaseProperties {
             if (claimExistingRewards) {
                 t(post.claimerBalance == pre.claimerBalance + pre.unclaimedRewards, "EACS01_1");
                 t(post.unclaimedRewards == 0, "EACS01_2");
+
+                // if claimExistingRewards=True, decreases unclaimed rewards for receiver address
+                shadowUnclaimedRewards[vars.claimer] -= pre.unclaimedRewards;
             } else {
                 t(post.claimerBalance == pre.claimerBalance, "EACS02_1");
                 t(post.unclaimedRewards == pre.unclaimedRewards, "EACS02_2");

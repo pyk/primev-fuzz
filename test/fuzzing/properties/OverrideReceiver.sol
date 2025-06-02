@@ -60,6 +60,11 @@ contract OverrideReceiverProperties is BaseProperties {
                     post.newReceiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.newReceiverUnclaimedRewards,
                     "ORS01"
                 );
+
+                // Decreases unclaimed rewards for msg.sender
+                shadowUnclaimedRewards[vars.receiver] -= pre.receiverUnclaimedRewards;
+                // Increases unclaimed rewards for new receiver
+                shadowUnclaimedRewards[vars.newReceiver] += pre.receiverUnclaimedRewards;
             } else {
                 t(post.newReceiverUnclaimedRewards == pre.newReceiverUnclaimedRewards, "ORS02");
                 t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ORS02");
@@ -125,6 +130,10 @@ contract OverrideReceiverProperties is BaseProperties {
                     post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards + pre.overrideUnclaimedRewards,
                     "ROAS01"
                 );
+
+                // Increases unclaimed rewards for new receiver
+                shadowUnclaimedRewards[vars.existingOverrideAddress] -= pre.overrideUnclaimedRewards;
+                shadowUnclaimedRewards[vars.receiver] += pre.overrideUnclaimedRewards;
             } else {
                 t(post.overrideUnclaimedRewards == pre.overrideUnclaimedRewards, "ROAS02");
                 t(post.receiverUnclaimedRewards == pre.receiverUnclaimedRewards, "ROAS02");
