@@ -21,7 +21,9 @@ contract Fuzz is
     PayProposerProperties,
     GlobalProperties,
     OverrideReceiverProperties,
-    AutoClaimProperties
+    AutoClaimProperties,
+    ClaimRewardsProperties,
+    ClaimOrphanedRewardsProperties
 {
     constructor() {
         // setupReceivers();
