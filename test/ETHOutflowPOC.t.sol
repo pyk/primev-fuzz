@@ -88,10 +88,10 @@ contract ETHOutflowPOC is Test {
         rewardManager.pause();
 
         // 3) Operator receives rewards even tho claimRewards paused
-        // Pause cannot halt ETH outflow due to autoclaim
         uint256 rewardAmount = 1 ether;
         rewardManager.payProposer{ value: rewardAmount }(pubkey);
 
+        // Pause cannot halt ETH outflow due to missing check in autoclaim mechanism
         assertEq(receiver.balance, rewardAmount);
     }
 }
